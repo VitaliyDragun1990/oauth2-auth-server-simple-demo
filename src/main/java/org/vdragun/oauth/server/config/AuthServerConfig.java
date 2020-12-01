@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.provider.client.InMemoryClientDetails
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Configuration
 @EnableAuthorizationServer
@@ -29,13 +30,23 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         InMemoryClientDetailsService clientDetailsService = new InMemoryClientDetailsService();
 
-        BaseClientDetails clientDetails = new BaseClientDetails();
-        clientDetails.setClientId("client");
-        clientDetails.setClientSecret("secret");
-        clientDetails.setScope(List.of("read"));
-        clientDetails.setAuthorizedGrantTypes(List.of("password"));
+        BaseClientDetails mobileAppClient = new BaseClientDetails();
+        mobileAppClient.setClientId("mobile");
+        mobileAppClient.setClientSecret("secret");
+        mobileAppClient.setScope(List.of("read"));
+        mobileAppClient.setAuthorizedGrantTypes(List.of("password"));
 
-        clientDetailsService.setClientDetailsStore(Map.of("client", clientDetails));
+        BaseClientDetails webAppClient = new BaseClientDetails();
+        webAppClient.setClientId("web");
+        webAppClient.setClientSecret("secret");
+        webAppClient.setScope(List.of("read"));
+        webAppClient.setAuthorizedGrantTypes(List.of("authorization_code"));
+        webAppClient.setRegisteredRedirectUri(Set.of("http://localhost:9090/home"));
+
+        clientDetailsService.setClientDetailsStore(Map.of(
+                "mobile", mobileAppClient,
+                "web", webAppClient
+        ));
 
         clients.withClientDetails(clientDetailsService);
     }
