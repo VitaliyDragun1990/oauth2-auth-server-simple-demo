@@ -43,9 +43,16 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         webAppClient.setAuthorizedGrantTypes(List.of("authorization_code"));
         webAppClient.setRegisteredRedirectUri(Set.of("http://localhost:9090/home"));
 
+        BaseClientDetails backendApp = new BaseClientDetails();
+        backendApp.setClientId("backend");
+        backendApp.setClientSecret("secret");
+        backendApp.setScope(List.of("info"));
+        backendApp.setAuthorizedGrantTypes(List.of("client_credentials"));
+
         clientDetailsService.setClientDetailsStore(Map.of(
                 "mobile", mobileAppClient,
-                "web", webAppClient
+                "web", webAppClient,
+                "backend", backendApp
         ));
 
         clients.withClientDetails(clientDetailsService);
