@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.security.oauth2.provider.client.InMemoryClientDetailsService;
 
@@ -49,12 +50,22 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         backendApp.setScope(List.of("info"));
         backendApp.setAuthorizedGrantTypes(List.of("client_credentials"));
 
+        BaseClientDetails resourceServerClient = new BaseClientDetails();
+        resourceServerClient.setClientSecret("resourceserver");
+        resourceServerClient.setClientSecret("secret");
+
         clientDetailsService.setClientDetailsStore(Map.of(
                 "mobile", mobileAppClient,
                 "web", webAppClient,
-                "backend", backendApp
+                "backend", backendApp,
+                "resourceserver", resourceServerClient
         ));
 
         clients.withClientDetails(clientDetailsService);
+    }
+
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        security.checkTokenAccess("isAuthenticated()");
     }
 }
