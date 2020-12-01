@@ -34,13 +34,13 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         mobileAppClient.setClientId("mobile");
         mobileAppClient.setClientSecret("secret");
         mobileAppClient.setScope(List.of("read"));
-        mobileAppClient.setAuthorizedGrantTypes(List.of("password"));
+        mobileAppClient.setAuthorizedGrantTypes(List.of("password", "refresh_token"));
 
         BaseClientDetails webAppClient = new BaseClientDetails();
         webAppClient.setClientId("web");
         webAppClient.setClientSecret("secret");
         webAppClient.setScope(List.of("read"));
-        webAppClient.setAuthorizedGrantTypes(List.of("authorization_code"));
+        webAppClient.setAuthorizedGrantTypes(List.of("authorization_code", "refresh_token"));
         webAppClient.setRegisteredRedirectUri(Set.of("http://localhost:9090/home"));
 
         BaseClientDetails backendApp = new BaseClientDetails();
