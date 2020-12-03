@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.provider.client.InMemoryClientDetails
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.rsa.crypto.KeyStoreKeyFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -27,8 +29,14 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Value("${jwt.key}")
-    private String jwtKey;
+    @Value("${jks.password}")
+    private String privateKeyPassword;
+
+    @Value("${jks.privateKey}")
+    private String privateKey;
+
+    @Value("${jks.alias}")
+    private String privateKeyAlias;
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
@@ -46,7 +54,14 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey(jwtKey);
+
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(
+                new ClassPathResource(privateKey),
+                privateKeyPassword.toCharArray()
+        );
+
+        converter.setKeyPair(keyStoreKeyFactory.getKeyPair(privateKeyAlias));
+
         return converter;
     }
 
